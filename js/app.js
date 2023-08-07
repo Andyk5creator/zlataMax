@@ -364,6 +364,19 @@
                 return isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows();
             }
         };
+        function isWebp() {
+            function testWebP(callback) {
+                let webP = new Image;
+                webP.onload = webP.onerror = function() {
+                    callback(webP.height == 2);
+                };
+                webP.src = "data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA";
+            }
+            testWebP((function(support) {
+                let className = support === true ? "webp" : "no-webp";
+                document.documentElement.classList.add(className);
+            }));
+        }
         const convertTo = (unit, px) => px / 16 + unit;
         const pageLockToggle = (unLockTime = 0, lock = true) => {
             const page = document.documentElement;
@@ -381,8 +394,8 @@
             breakpoints.forEach((breakpoint => {
                 if (breakpoint in mediaQueris) {
                     const matchMedia = window.matchMedia(`(max-width: ${convertTo("em", mediaQueris[breakpoint])})`);
-                    const reload = () => location.reload();
-                    matchMedia.addEventListener("change", (() => reload()));
+                    const reload = () => {};
+                    matchMedia.addEventListener("change", (() => location.reload()));
                     fontSizeListener(reload);
                 }
             }));
@@ -762,13 +775,14 @@
                 function initDropdowns(dropdownsArray, matchMedia = false) {
                     dropdownsArray.forEach((dropdownBlock => {
                         dropdownBlock = matchMedia ? dropdownBlock.item : dropdownBlock;
-                        if (matchMedia.matches || !matchMedia) dropdownBlock.classList.add("_dropdown-init"); else dropdownBlock.classList.remove("_dropdown-init");
+                        if (matchMedia.matches || !matchMedia) document.addEventListener("click", setDropdownActions); else document.removeEventListener("click", setDropdownActions);
                     }));
                 }
                 function setDropdownActions(e) {
+                    console.log("test");
                     const el = e.target;
                     if (isMobile.any()) {
-                        if (el.closest("button[data-dropdown-arrow]") && el.closest("[data-dropdown]").classList.contains("_dropdown-init")) toggleDropdown(el); else if (el.closest("button[data-dropdown]") && el.classList.contains("_dropdown-init")) toggleDropdown(el);
+                        if (el.closest("button[data-dropdown-arrow]")) toggleDropdown(el); else if (el.closest("button[data-dropdown]")) toggleDropdown(el);
                         if (!el.closest("[data-dropdown]") && document.querySelector("[data-dropdown]._dropdown-open")) {
                             const openDropdown = document.querySelector("[data-dropdown]._dropdown-open");
                             toggleDropdown(openDropdown);
@@ -776,7 +790,6 @@
                     }
                 }
                 function toggleDropdown(el) {
-                    console.log("test");
                     const dropdownBlock = el.closest("[data-dropdown]");
                     const oneDropdown = dropdownBlock.hasAttribute("data-one-dropdown");
                     const openDropdown = document.querySelector("._dropdown-open");
@@ -10755,6 +10768,7 @@ PERFORMANCE OF THIS SOFTWARE.
             }
         }
         setCatalogMenuClolumsQuantiy();
+        isWebp();
         spollers();
         refreshPage([ "lg" ]);
         tabs();
